@@ -26,7 +26,9 @@ LIBS				=
 
 
 SRCS				=	srcs/main.cpp				\
-						srcs/Mattdaemon.cpp
+						srcs/Mattdaemon.cpp			\
+						srcs/Tintin_reporter.cpp	\
+						srcs/Fd.cpp
 
 OBJS				=	$(SRCS:.cpp=.o)
 

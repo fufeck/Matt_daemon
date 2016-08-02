@@ -10,28 +10,33 @@
 //                                                                            //
 // ************************************************************************** //
 
+#include <time.h>
+
 #include "Mattdaemon.hpp"
 
 int main(void)
 {
+
 	Mattdaemon	*daemon;
-	pid_t				pid;
+	daemon = new Mattdaemon();
+	daemon->run();
+	// pid_t				pid;
  
-	if ((pid = fork()) < 0) {
-		// IF FAIL
-		std::cerr << "ERROR : fork fail" << std::endl;
-		return( EXIT_FAILURE );
-	} else if (pid > 0) {
-		// IF FATHER
-		std::cout << "Je suis le père " << pid << std::endl;
-		return( EXIT_SUCCESS );
-	} else {
-		try {
-			daemon = new Mattdaemon();
-			daemon->run();
-		} catch (std::exception & e) {
-			std::cerr << "Exception : " << e.what() << std::endl;
-		}
-	}
+	// if ((pid = fork()) < 0) {
+	// 	// IF FAIL
+	// 	std::cerr << "ERROR : fork fail" << std::endl;
+	// 	return( EXIT_FAILURE );
+	// } else if (pid > 0) {
+	// 	// IF FATHER
+	// 	std::cout << "Je suis le père " << pid << std::endl;
+	// 	return( EXIT_SUCCESS );
+	// } else {
+	// 	try {
+	// 		daemon = new Mattdaemon();
+	// 		daemon->run();
+	// 	} catch (std::exception & e) {
+	// 		std::cerr << "Exception : " << e.what() << std::endl;
+	// 	}
+	// }
 	return( EXIT_SUCCESS );
 }

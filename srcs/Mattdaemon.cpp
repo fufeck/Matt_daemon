@@ -12,22 +12,24 @@
 
 #include "Mattdaemon.hpp"
 
-Mattdaemon::Mattdaemon(void) {
-	umask(0);
-	if ((this->sid = setsid()) < 0) {		
-		throw Mattdaemon::SidException();
-	}
+Mattdaemon::Mattdaemon(void) : _tintin_reporter(PATH_DIR_LOG) {
+	this->_tintin_reporter.write("Matt_daemon: Started", "INFO");
+	this->_tintin_reporter.write("Matt_daemon: Creating server.", "INFO");
+	// umask(0777);
+	// if ((this->_sid = setsid()) < 0) {		
+	// 	throw Mattdaemon::SidException();
+	// }
 	this->_startserver();
-	std::cout << "Je suis le fils " << sid << std::endl;
+	this->_tintin_reporter.write("Matt_daemon: Server created.", "INFO");
+
 }
 
 Mattdaemon::~Mattdaemon(void) {
-
 	return ;
 }
 
-void			Mattdaemon::_startserver(void) {
-
+void					Mattdaemon::_startserver(void) {
+	int					fdsock;
 	struct sockaddr_in	sin;
 	struct protoent		*pe;
 
@@ -35,7 +37,7 @@ void			Mattdaemon::_startserver(void) {
 		throw Mattdaemon::PeException();
 	}
 
-	if ((this->fd = socket(PF_INET, SOCK_STREAM, pe->p_proto)) < 0) {
+	if ((fdsock = socket(PF_INET, SOCK_STREAM, pe->p_proto)) < 0) {
 		throw Mattdaemon::SocketException();
 	}
 
@@ -43,127 +45,113 @@ void			Mattdaemon::_startserver(void) {
 	sin.sin_addr.s_addr = INADDR_ANY;
 	sin.sin_port = htons(PORT);
 
-	if (bind(this->fd, (struct sockaddr*)&sin, sizeof(sin)) < 0) {
+	if (bind(fdsock, (struct sockaddr*)&sin, sizeof(sin)) < 0) {
 		throw Mattdaemon::BindException();
 	}
-	if (listen(this->fd, 42) < 0) {
+	if (listen(fdsock, 4242) < 0) {
 		throw Mattdaemon::ListenException();
 	}
-	return (0);
+	this->_fds.push_front(new Fd(FD_SERVER, fdsock));
 }
-
-
-
-
-
-
-
-void			Mattdaemon::_startserver(void) {
-     int sockfd, newsockfd, portno;
-
-     socklen_t clilen;
-     char buffer[256];
-
-     struct sockaddr_in serv_addr, cli_addr;
-
-     int n;
-     if (argc < 2) {
-         fprintf(stderr,"ERROR, no port provided\n");
-         exit(1);
-     }
-     sockfd = socket(AF_INET, SOCK_STREAM, 0);
-     if (sockfd < 0) 
-        error("ERROR opening socket");
-     bzero((char *) &serv_addr, sizeof(serv_addr));
-     portno = atoi(argv[1]);
-     serv_addr.sin_family = AF_INET;
-     serv_addr.sin_addr.s_addr = INADDR_ANY;
-     serv_addr.sin_port = htons(portno);
- 
-     if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) 
-		error("ERROR on binding");
-     listen(sockfd,5);
-     clilen = sizeof(cli_addr);
-     newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
-     if (newsockfd < 0) 
-		error("ERROR on accept");
-     bzero(buffer,256);
-
-     n = read(newsockfd,buffer,255);
-     if (n < 0) error("ERROR reading from socket");
-     printf("Here is the message: %s\n",buffer);
-     n = write(newsockfd,"I got your message",18);
-     if (n < 0) error("ERROR writing to socket");
-     close(newsockfd);
-     close(sockfd);
-     return 0; 
-}
-
-
 
 bool			Mattdaemon::_isEnd(void) {
-	return (false);
+	return (true);
 }
 
-static void		init_fd(t_serv *s)
-{
-	int			i;
+void					Mattdaemon::_accept_client(const int fdsock) {
+	int					cs;
+	struct sockaddr_in	csin;
+	socklen_t			csin_len;
 
-	i = 0;
-	s->maxfd = 0;
-	FD_ZERO(&s->rd);
-	FD_ZERO(&s->wr);
-	while (i < FD_MAX)
-	{
-		if (s->fds[i].type != FD_FREE)
-		{
-			if (s->fds[i].cmd == NULL && s->fds[i].type != FD_GFX)
-				FD_SET(i, &s->rd);
-			if (s->fds[i].msg != NULL)
-				FD_SET(i, &s->wr);
-			s->maxfd = i;
-		}
-		i++;
+	std::cout << "accept client" << std::endl;
+	csin_len = sizeof(csin);
+	if ((cs = accept(fdsock, (struct sockaddr*)&csin, &csin_len)) < 0) {
+		this->_tintin_reporter.write("Accept client fail.", "ERROR");
+		return ;
 	}
+	printf("New client #%d\n", cs);
+	this->_fds.push_front(new Fd(FD_CLIENT, cs));
 }
 
-static int		check_fd(t_serv *s, int i)
-{
-	int			ret;
-
-	while (i < FD_MAX)
-	{
-		if (s->fds[i].type != FD_FREE)
-		{
-			ret = 0;
-			if (FD_ISSET(i, &s->rd))
-				ret = s->fds[i].fct_read(s, i);
-			else if (FD_ISSET(i, &s->wr))
-				ret = s->fds[i].fct_write(s, i);
-			if (ret == 0 && s->fds[i].type == FD_PLAYER)
-				ret = player_turn(s, i);
-			if (ret < 0)
-				client_quit(s, i);
-		}
-		i++;
+void					Mattdaemon::_display_msgs(void) {
+	for (std::list<std::string *>::iterator it = this->_msgs.begin(); it != this->_msgs.end(); it++) {
+		this->_tintin_reporter.write(**it, "LOG");
+		std::cout << **it << std::endl;
 	}
+    this->_msgs.clear();
+}
+
+int					Mattdaemon::_read_client(const int fd) {
+
+	std::string 		*str = new std::string();
+	char				buff[BUF_SIZE + 1];
+	int					len;
+
+	std::cout << "client read" << std::endl;
+	bzero(buff, BUF_SIZE);
+	while ((len = read(fd, buff, BUF_SIZE)) >= BUF_SIZE) {
+		if (len <= 0) {
+			return (-1);
+		}
+		buff[len] = '\0';
+		*str += std::string(buff);
+		bzero(buff, BUF_SIZE);
+	}
+	if (len <= 0) {
+		return (-1);
+	}
+	buff[len] = '\0';
+	*str += std::string(buff);
+	this->_msgs.push_front(str);
 	return (0);
+}
+
+
+void			Mattdaemon::_init_fd(void) {
+	std::cout << "init fd" << std::endl;
+	FD_ZERO(&this->_rd);
+	for (std::list<Fd *>::iterator it = this->_fds.begin(); it != this->_fds.end(); it++) {
+		if ((*it)->type != FD_FREE) {
+			std::cout << (*it)->type << " : " << (*it)->fd << " init" << std::endl;
+			FD_SET((*it)->fd, &this->_rd);
+		}
+	}
+}
+
+
+void			Mattdaemon::_loop_fd(void) {
+
+	std::cout << "loop fd" << std::endl;
+	for (std::list<Fd *>::iterator it = this->_fds.begin(); it != this->_fds.end(); it++) {
+		if (FD_ISSET((*it)->fd, &this->_rd)) {
+			// std::cout << (*it)->type << std::endl;
+			if ((*it)->type == FD_SERVER) {
+				this->_accept_client((*it)->fd);
+			} else if ((*it)->type == FD_CLIENT) {
+				if (this->_read_client((*it)->fd) < 0) {
+					this->_fds.erase(it);
+				}
+
+			}
+		}
+	}
 }
 
 void		Mattdaemon::run(void) {
-	t_time		tv;
-	tv.tv_sec = s->t.tv_sec;
-	tv.tv_usec = s->t.tv_usec;
 
-	printf("Zappy starting...\n");
-	while (this->_isEnd())
-	{
-		// init_fd(s);
-		if (select(2, this->rd, NULL, NULL, &tv) < 0) {
+	this->_tintin_reporter.write("Matt_daemon: Entering Daemon mode.", "INFO");
+	this->_tintin_reporter.write("Matt_daemon: started. PID: 6498.", "INFO");
+
+	while (this->_isEnd()) {
+		printf("start loop\n");
+		this->_display_msgs();
+		this->_init_fd();
+		std::cout << "Select : " << this->_fds.size() + 3 << std::endl;
+		if (select(this->_fds.size() + 3, &this->_rd, NULL, NULL, NULL) < 0) {
 			throw Mattdaemon::SelectException();
 		}
-		// check_fd(s, 0);
-		// baby_turn(s);
-		// check_life(s);
+		this->_loop_fd();
+		std::cout<< std::endl<< std::endl<< std::endl<< std::endl<< std::endl;
+		usleep(500000);
 	}
 }
