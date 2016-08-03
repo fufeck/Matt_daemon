@@ -21,21 +21,26 @@
 #include <fstream>
 
 
+#define				DECAL_MONTH		1
+#define				DECAL_YEAR		1900
+
 class Tintin_reporter
 {
 
 private:
-	std::ofstream fs;
+	const std::string	_dirname;
+	const bool			_isLock;
+	int					_fd;
 
 	Tintin_reporter(void);
 	Tintin_reporter(Tintin_reporter const &);
 	Tintin_reporter&	operator=(Tintin_reporter const &);
 
 public:
-	Tintin_reporter(std::string direname);
+	Tintin_reporter(std::string direname, bool isLock);
 	~Tintin_reporter(void);
 
-	void				write(const std::string &str, const std::string type);
+	void				writeFile(const std::string &str, const std::string type) const;
 
 
 	class OpenException : public std::exception {

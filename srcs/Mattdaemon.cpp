@@ -12,19 +12,20 @@
 
 #include "Mattdaemon.hpp"
 
-Mattdaemon::Mattdaemon(void) : _tintin_reporter(PATH_DIR_LOG) {
-	this->_tintin_reporter.write("Matt_daemon: Started", "INFO");
-	this->_tintin_reporter.write("Matt_daemon: Creating server.", "INFO");
+Mattdaemon::Mattdaemon(const Tintin_reporter *tintin_reporter) : _log(tintin_reporter) {
+	this->_log->writeFile("Matt_daemon: Creating server.", "INFO");
 	// umask(0777);
 	// if ((this->_sid = setsid()) < 0) {		
 	// 	throw Mattdaemon::SidException();
 	// }
+	this->_isEnd = false;
 	this->_startserver();
-	this->_tintin_reporter.write("Matt_daemon: Server created.", "INFO");
+	this->_log->writeFile("Matt_daemon: Server created.", "INFO");
 
 }
 
 Mattdaemon::~Mattdaemon(void) {
+	std::cout << "DELETE MATTDAEMON" << std::endl;
 	return ;
 }
 
@@ -54,10 +55,6 @@ void					Mattdaemon::_startserver(void) {
 	this->_fds.push_front(new Fd(FD_SERVER, fdsock));
 }
 
-bool			Mattdaemon::_isEnd(void) {
-	return (true);
-}
-
 void					Mattdaemon::_accept_client(const int fdsock) {
 	int					cs;
 	struct sockaddr_in	csin;
@@ -66,7 +63,7 @@ void					Mattdaemon::_accept_client(const int fdsock) {
 	std::cout << "accept client" << std::endl;
 	csin_len = sizeof(csin);
 	if ((cs = accept(fdsock, (struct sockaddr*)&csin, &csin_len)) < 0) {
-		this->_tintin_reporter.write("Accept client fail.", "ERROR");
+		this->_log->writeFile("Accept client fail.", "ERROR");
 		return ;
 	}
 	printf("New client #%d\n", cs);
@@ -75,7 +72,13 @@ void					Mattdaemon::_accept_client(const int fdsock) {
 
 void					Mattdaemon::_display_msgs(void) {
 	for (std::list<std::string *>::iterator it = this->_msgs.begin(); it != this->_msgs.end(); it++) {
-		this->_tintin_reporter.write(**it, "LOG");
+		std::cout << "QUIT : " << (**it).compare("quit") << std::endl;
+		if ((**it).compare("quit") == 0) {
+			this->_log->writeFile("Matt_daemon: Request quit.", "INFO");
+			this->_isEnd = true;
+		} else {
+			this->_log->writeFile(**it, "LOG");
+		}
 		std::cout << **it << std::endl;
 	}
     this->_msgs.clear();
@@ -102,6 +105,7 @@ int					Mattdaemon::_read_client(const int fd) {
 	}
 	buff[len] = '\0';
 	*str += std::string(buff);
+	(*str).erase(std::remove((*str).begin(), (*str).end(), '\n'), (*str).end());
 	this->_msgs.push_front(str);
 	return (0);
 }
@@ -137,21 +141,26 @@ void			Mattdaemon::_loop_fd(void) {
 	}
 }
 
+void		Mattdaemon::finish(void) {
+	this->_isEnd = true;
+	this->_log->writeFile("Matt_daemon: Signal receive.", "INFO");
+}
+
 void		Mattdaemon::run(void) {
 
-	this->_tintin_reporter.write("Matt_daemon: Entering Daemon mode.", "INFO");
-	this->_tintin_reporter.write("Matt_daemon: started. PID: 6498.", "INFO");
+	this->_log->writeFile("Matt_daemon: Entering Daemon mode.", "INFO");
+	this->_log->writeFile("Matt_daemon: started. PID: 6498.", "INFO");
 
-	while (this->_isEnd()) {
-		printf("start loop\n");
-		this->_display_msgs();
+	while (!this->_isEnd) {
 		this->_init_fd();
-		std::cout << "Select : " << this->_fds.size() + 3 << std::endl;
-		if (select(this->_fds.size() + 3, &this->_rd, NULL, NULL, NULL) < 0) {
+		std::cout << "Select : " << this->_fds.size() + 5 << std::endl;
+		if (select(this->_fds.size() + 5, &this->_rd, NULL, NULL, NULL) < 0) {
 			throw Mattdaemon::SelectException();
 		}
 		this->_loop_fd();
 		std::cout<< std::endl<< std::endl<< std::endl<< std::endl<< std::endl;
+		this->_display_msgs();
 		usleep(500000);
 	}
+	std::cout << "end of run" << std::endl;
 }

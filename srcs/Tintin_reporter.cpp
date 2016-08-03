@@ -10,52 +10,68 @@
 //                                                                            //
 // ************************************************************************** //
 
+#include <sys/types.h>
+#include <stdio.h>
+#include <iostream>
+#include <iomanip>
+#include <sstream>
+#include <fcntl.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include "Tintin_reporter.hpp"
 
-Tintin_reporter::Tintin_reporter(std::string dirname) {
-	(void)dirname;
-	// std::string delimiter = "/";
-	// size_t pos = 0;
-	// std::string token;
+Tintin_reporter::Tintin_reporter(std::string dirname, bool isLock) : _dirname(dirname), _isLock(isLock) {
+	std::string 	delimiter = "/";
+	size_t 			pos = 0;
+	std::string 	token;
 
-	// while ((pos = dirname.find(delimiter)) != std::string::npos) {
-	//     token = dirname.substr(0, pos);
-	//     // std::cout << std::string(token + "/").c_str() << std::endl;
-	//     if (chdir(std::string(token + "/").c_str()) < 0) {
-	// 		if (mkdir(token.c_str(), 0777) < 0) {
-	// 			throw Tintin_reporter::CdException();
-	// 		}
-	//     }
-	//     dirname.erase(0, pos + delimiter.length());
-	// }
-	// try {
-	// 	this->fs.open(dirname, std::fstream::trunc);
-	// 	// std::cout << "file " << dirname << " is open" << std::endl;
-	// } catch (std::fstream::failure e) {
-	// 	throw Tintin_reporter::OpenException();
- //  	}
-	// return ;
+	while ((pos = dirname.find(delimiter)) != std::string::npos) {
+	    token = dirname.substr(0, pos);
+	    if (chdir(std::string(token + "/").c_str()) < 0) {
+			if (mkdir(token.c_str(), 0777) < 0) {
+				throw Tintin_reporter::CdException();
+			}
+	    }
+	    dirname.erase(0, pos + delimiter.length());
+	}
+	if (isLock) {
+		if ((this->_fd = open(dirname.c_str(), O_CREAT | O_EXLOCK)) < 0) {
+			throw Tintin_reporter::OpenException();
+		}
+	} else {
+		if ((this->_fd = open(dirname.c_str(), O_WRONLY | O_CREAT | O_SHLOCK, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)) < 0) {
+			throw Tintin_reporter::OpenException();
+		}
+	}
+	return ;
 }
+
 
 Tintin_reporter::~Tintin_reporter(void) {
- //  	this->fs.close();
-	// return ;
+	std::cout << "DELETE TINTIN : " << this->_isLock << std::endl;
+	if (this->_fd > 0) {
+		std::cout << "FD CLOSE" << std::endl;
+		close(this->_fd);
+		if (this->_isLock) {
+			std::cout << "FILE DELETE" << std::endl;
+			remove(this->_dirname.c_str());
+		}
+	}
+	return ;
 }
 
-void				Tintin_reporter::write(const std::string &str, const std::string type) {
-	(void)str;
-	(void)type;
-	// time_t t = time(NULL);
-	// struct tm *ti = localtime(&t);
+void				Tintin_reporter::writeFile(const std::string &str, const std::string type) const {
+	time_t 			t = time(NULL);
+	struct 			tm *ti = localtime(&t);
+	std::stringstream 	ss;
 
-	// // std::cout << "[" << ti->tm_mday << "/" << ti->tm_mon << "/" << ti->tm_year << "-" << ti->tm_hour << "-" << ti->tm_min << "-" << ti->tm_sec << "]";
-	// // std::cout << "[ " << type << " ] - ";
-	// // std::cout <<  str << std::endl;
-
-	// this->fs << "[" << ti->tm_mday << "/" << ti->tm_mon << "/" << ti->tm_year << "-" << ti->tm_hour << "-" << ti->tm_min << "-" << ti->tm_sec << "]";
-	// this->fs << "[ " << type << " ] - ";
-	// this->fs << str << std::endl;
-	// return ;
+	lseek(this->_fd, 0, SEEK_END);
+	ss << "[" << std::setw(2) << std::setfill('0') << ti->tm_mday << "/" << std::setw(2) << std::setfill('0') << (ti->tm_mon + DECAL_MONTH) << "/" << (ti->tm_year + DECAL_YEAR);
+	ss << "-" << std::setw(2) << std::setfill('0') << ti->tm_hour << ":" << std::setw(2) << std::setfill('0') << ti->tm_min << ":" << std::setw(2) << std::setfill('0') << ti->tm_sec << "] ";
+	ss << "[ " << type << " ] - ";
+	ss << str << std::endl;
+	if (write(this->_fd, ss.str().c_str(), ss.str().size()) < 0) {
+		throw Tintin_reporter::OpenException();
+	}
+	return ;
 }
