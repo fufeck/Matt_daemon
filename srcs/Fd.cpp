@@ -10,6 +10,8 @@
 //                                                                            //
 // ************************************************************************** //
 
+#include <iostream>
+
 #include "Fd.hpp"
 
 Fd::Fd(int type, int fd) : type(type), fd(fd) {

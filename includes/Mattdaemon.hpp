@@ -13,20 +13,9 @@
 #ifndef MATTDAEMON_HPP
 # define MATTDAEMON_HPP
 
-#include <iostream>
 #include <stdexcept>
 #include <list>
 #include <string>
-
-#include <sys/stat.h>
-#include <sys/time.h>
-#include <sys/types.h>
-#include <unistd.h>
-#include <sys/socket.h>
-#include <sys/select.h>
-#include <netdb.h>
-#include <netinet/in.h>
-#include <time.h>
 
 #include "Fd.hpp"
 #include "Tintin_reporter.hpp"
@@ -48,7 +37,6 @@ private:
 	const Tintin_reporter		*_log;
 	Tintin_reporter				*_lock;
 
-	pid_t						_sid;
 	bool						_isEnd;
 	fd_set						_rd;
 	std::list<Fd *>				_fds;

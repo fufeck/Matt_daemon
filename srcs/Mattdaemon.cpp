@@ -10,45 +10,49 @@
 //                                                                            //
 // ************************************************************************** //
 
+#include <netdb.h>
+#include <sys/socket.h>
+#include <sys/select.h>
+
+#include <iostream>
+#include <sstream>
+
 #include "Mattdaemon.hpp"
 
 Mattdaemon::Mattdaemon(const Tintin_reporter *tintin_reporter) : _log(tintin_reporter) {
-	this->_log->writeFile("Matt_daemon: Creating server.", "INFO");
-	// umask(0777);
-	// if ((this->_sid = setsid()) < 0) {		
-	// 	throw Mattdaemon::SidException();
-	// }
+	pid_t				sid;
+	std::stringstream 	ss;
+
 	this->_isEnd = false;
+	this->_log->writeFile("Matt_daemon: Creating server.", "INFO");
 	this->_startserver();
 	this->_log->writeFile("Matt_daemon: Server created.", "INFO");
-
+	this->_log->writeFile("Matt_daemon: Entering Daemon mode.", "INFO");
+	if ((sid = setsid()) < 0) {
+		throw Mattdaemon::SidException();
+	}
+	ss << "Matt_daemon: started. PID: " << sid << ".";
+	this->_log->writeFile(ss.str(), "INFO");
 }
 
 Mattdaemon::~Mattdaemon(void) {
 	
 	for (std::list<Fd *>::iterator it = this->_fds.begin(); it != this->_fds.end(); it++) {
 		if ((*it)->type == FD_CLIENT) {
-			// std::cout << "CLOSE FD " << (*it)->fd << std::endl;
 			close((*it)->fd);
-			// std::cout << "CLIENT DELETE " << *it << std::endl;
 			delete *it;
 			this->_fds.erase(it);
 		}
 	}
 	for (std::list<Fd *>::iterator it = this->_fds.begin(); it != this->_fds.end(); it++) {
 		if ((*it)->type == FD_SERVER) {
-			// std::cout << "CLOSE FD " << (*it)->fd << std::endl;
 			close((*it)->fd);
-			// std::cout << "SERVER DELETE " << *it << std::endl;
 			delete *it;
 			this->_fds.erase(it);
 		}
 	}
-	// std::cout << "FD " << this->_fds.size() << std::endl;
     this->_fds.clear();
     this->_msgs.clear();
-
-	// std::cout << "DELETE MATTDAEMON" << std::endl;
 	return ;
 }
 
@@ -83,14 +87,12 @@ void					Mattdaemon::_accept_client(const int fdsock) {
 	struct sockaddr_in	csin;
 	socklen_t			csin_len;
 
-	// std::cout << "accept client" << std::endl;
 	csin_len = sizeof(csin);
 	if ((cs = accept(fdsock, (struct sockaddr*)&csin, &csin_len)) < 0) {
 		this->_log->writeFile("Accept client fail.", "ERROR");
 		return ;
 	}
 	if (this->_fds.size() < FD_MAX) {
-		// printf("New client #%d\n", cs);
 		this->_fds.push_front(new Fd(FD_CLIENT, cs));
 	} else {
 		close(cs);
@@ -101,17 +103,16 @@ void					Mattdaemon::_accept_client(const int fdsock) {
 }
 
 void					Mattdaemon::_display_msgs(void) {
+
 	for (std::list<std::string *>::iterator it = this->_msgs.begin(); it != this->_msgs.end(); it++) {
-		// std::cout << "QUIT : " << (**it).compare("quit") << std::endl;
 		if ((**it).compare("quit") == 0) {
 			this->_log->writeFile("Matt_daemon: Request quit.", "INFO");
 			this->_isEnd = true;
 		} else {
-			this->_log->writeFile(**it, "LOG");
+			this->_log->writeFile("Matt_daemon: User input: " + **it, "LOG");
 		}
 		delete *it;
 		this->_msgs.erase(it);
-		// std::cout << **it << std::endl;
 	}
     this->_msgs.clear();
 }
@@ -122,7 +123,6 @@ int					Mattdaemon::_read_client(const int fd) {
 	char				buff[BUF_SIZE + 1];
 	int					len;
 
-	// std::cout << "client read" << std::endl;
 	bzero(buff, BUF_SIZE);
 	while ((len = read(fd, buff, BUF_SIZE)) >= BUF_SIZE) {
 		if (len <= 0) {
@@ -144,11 +144,10 @@ int					Mattdaemon::_read_client(const int fd) {
 
 
 void			Mattdaemon::_init_fd(void) {
-	// std::cout << "init fd" << std::endl;
+
 	FD_ZERO(&this->_rd);
 	for (std::list<Fd *>::iterator it = this->_fds.begin(); it != this->_fds.end(); it++) {
 		if ((*it)->type != FD_FREE) {
-			// std::cout << (*it)->type << " : " << (*it)->fd << " init" << std::endl;
 			FD_SET((*it)->fd, &this->_rd);
 		}
 	}
@@ -157,10 +156,8 @@ void			Mattdaemon::_init_fd(void) {
 
 void			Mattdaemon::_loop_fd(void) {
 
-	// std::cout << "loop fd" << std::endl;
 	for (std::list<Fd *>::iterator it = this->_fds.begin(); it != this->_fds.end(); it++) {
 		if (FD_ISSET((*it)->fd, &this->_rd)) {
-			// std::cout << (*it)->type << std::endl;
 			if ((*it)->type == FD_SERVER) {
 				this->_accept_client((*it)->fd);
 			} else if ((*it)->type == FD_CLIENT) {
@@ -176,26 +173,22 @@ void			Mattdaemon::_loop_fd(void) {
 }
 
 void		Mattdaemon::finish(void) {
+
 	this->_isEnd = true;
 	this->_log->writeFile("Matt_daemon: Signal receive.", "INFO");
 }
 
-void		Mattdaemon::run(void) {
-
-	this->_log->writeFile("Matt_daemon: Entering Daemon mode.", "INFO");
-	this->_log->writeFile("Matt_daemon: started. PID: 6498.", "INFO");
-
+void					Mattdaemon::run(void) {
+	
 	while (!this->_isEnd) {
 		this->_init_fd();
-		// std::cout << "Select : " << this->_fds.size() + 5 << std::endl;
 		if (select(this->_fds.size() + 5, &this->_rd, NULL, NULL, NULL) < 0) {
-			if (this->_isEnd)
+			if (this->_isEnd) {
 				return ;
+			}
 			throw Mattdaemon::SelectException();
 		}
 		this->_loop_fd();
-		// std::cout<< std::endl<< std::endl<< std::endl<< std::endl<< std::endl;
 		this->_display_msgs();
-		usleep(500000);
 	}
 }

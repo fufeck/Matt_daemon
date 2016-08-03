@@ -10,14 +10,15 @@
 //                                                                            //
 // ************************************************************************** //
 
-#include <sys/types.h>
-#include <stdio.h>
+
+#include <unistd.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
 #include <iostream>
 #include <iomanip>
 #include <sstream>
-#include <fcntl.h>
-#include <stdlib.h>
-#include <unistd.h>
+
 #include "Tintin_reporter.hpp"
 
 Tintin_reporter::Tintin_reporter(std::string dirname, bool isLock) : _dirname(dirname), _isLock(isLock) {
@@ -48,12 +49,9 @@ Tintin_reporter::Tintin_reporter(std::string dirname, bool isLock) : _dirname(di
 
 
 Tintin_reporter::~Tintin_reporter(void) {
-	// std::cout << "DELETE TINTIN : " << this->_isLock << std::endl;
 	if (this->_fd > 0) {
-		// std::cout << "FD CLOSE" << std::endl;
 		close(this->_fd);
 		if (this->_isLock) {
-			// std::cout << "FILE DELETE" << std::endl;
 			remove(this->_dirname.c_str());
 		}
 	}
@@ -71,7 +69,7 @@ void				Tintin_reporter::writeFile(const std::string &str, const std::string typ
 	ss << "[ " << type << " ] - ";
 	ss << str << std::endl;
 	if (write(this->_fd, ss.str().c_str(), ss.str().size()) < 0) {
-		throw Tintin_reporter::OpenException();
+		throw Tintin_reporter::WriteException();
 	}
 	return ;
 }

@@ -13,12 +13,8 @@
 #ifndef TINTIN_REPORTER_HPP
 # define TINTIN_REPORTER_HPP
 
-#include <sys/stat.h>
-#include <sys/types.h>
 #include <stdexcept>
 #include <string>
-#include <iostream>
-#include <fstream>
 
 
 #define				DECAL_MONTH		1
@@ -42,17 +38,24 @@ public:
 
 	void				writeFile(const std::string &str, const std::string type) const;
 
-
 	class OpenException : public std::exception {
 	public:
 		virtual const char* what() const throw() {
 			return "Open fail";
 		}
 	};
+
 	class CdException : public std::exception {
 	public:
 		virtual const char* what() const throw() {
 			return "Chdir fail";
+		}
+	};
+
+	class WriteException : public std::exception {
+	public:
+		virtual const char* what() const throw() {
+			return "Write fail";
 		}
 	};
 	

@@ -13,11 +13,9 @@
 #ifndef FD_HPP
 # define FD_HPP
 
-#include <iostream>
 #include <unistd.h>
 #include <sys/stat.h>
 #include <stdexcept>
-
 
 class Fd
 {

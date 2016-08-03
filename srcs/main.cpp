@@ -10,8 +10,7 @@
 //                                                                            //
 // ************************************************************************** //
 
-#include <fcntl.h>
-#include <time.h>
+#include <signal.h>
 #include "Mattdaemon.hpp"
 #include "Tintin_reporter.hpp"
 
@@ -43,6 +42,7 @@ int 				main(void)
  	signal(SIGABRT, sighandler);
  	signal(SIGTERM, sighandler);
 
+ 	// std::cout << "a" << std::endl;
 	try {
 		// CREATE LOG FILE
 		log = new Tintin_reporter(PATH_DIR_LOG, false);
@@ -52,6 +52,7 @@ int 				main(void)
 		delete log;
 		return (EXIT_FAILURE);
 	}
+ 	// std::cout << "b" << std::endl;
 	try {
 		// CREATE LOCK FILE
 		lock = new Tintin_reporter(PATH_DIR_LOCK, true);
@@ -63,13 +64,14 @@ int 				main(void)
 		delete lock;
 		return (EXIT_FAILURE);
 	}
+ 	// std::cout << "c" << std::endl;
 	if ((pid = fork()) < 0) {
 		// IF FAIL
 		std::cerr << "ERROR : fork fail" << std::endl;
 		return( EXIT_FAILURE );
 	} else if (pid > 0) {
 		// IF FATHER
-		std::cout << "Je suis le père " << pid << std::endl;
+		// std::cout << "Je suis le père " << pid << std::endl;
 		return( EXIT_SUCCESS );
 	} else {
 		try {
