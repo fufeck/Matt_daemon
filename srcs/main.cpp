@@ -26,7 +26,7 @@ void					*sigleton(Mattdaemon *daemon) {
 
 void sighandler(int signum)
 {
-	std::cout << "SIG" << std::endl;
+	// std::cout << "SIG" << std::endl;
 	Mattdaemon 			*daemon = (Mattdaemon *)sigleton(NULL);
 	(void)signum;
 	daemon->finish();
@@ -34,6 +34,7 @@ void sighandler(int signum)
 
 int 				main(void)
 {
+	pid_t			pid;
 	Mattdaemon		*daemon;
 	Tintin_reporter	*log;
 	Tintin_reporter	*lock;
@@ -41,6 +42,7 @@ int 				main(void)
  	signal(SIGINT, sighandler);
  	signal(SIGABRT, sighandler);
  	signal(SIGTERM, sighandler);
+
 	try {
 		// CREATE LOG FILE
 		log = new Tintin_reporter(PATH_DIR_LOG, false);
@@ -50,7 +52,6 @@ int 				main(void)
 		delete log;
 		return (EXIT_FAILURE);
 	}
-	std::cout << "coucou" << std::endl;
 	try {
 		// CREATE LOCK FILE
 		lock = new Tintin_reporter(PATH_DIR_LOCK, true);
@@ -62,44 +63,34 @@ int 				main(void)
 		delete lock;
 		return (EXIT_FAILURE);
 	}
-	std::cout << "caca" << std::endl;
-	try {
-		// CREATE AND RUN DAEMON
-		daemon = new Mattdaemon(log);
-
-		sigleton(daemon);
-
-		daemon->run();
-	} catch (std::exception & e) {
-		log->writeFile(std::string("Matt_daemon: ") + e.what(), "ERROR");
+	if ((pid = fork()) < 0) {
+		// IF FAIL
+		std::cerr << "ERROR : fork fail" << std::endl;
+		return( EXIT_FAILURE );
+	} else if (pid > 0) {
+		// IF FATHER
+		std::cout << "Je suis le père " << pid << std::endl;
+		return( EXIT_SUCCESS );
+	} else {
+		try {
+			// CREATE AND RUN DAEMON
+			// std::cout << "Je suis le fils " << pid << std::endl;
+			daemon = new Mattdaemon(log);
+			sigleton(daemon);
+			daemon->run();
+		} catch (std::exception & e) {
+			log->writeFile(std::string("Matt_daemon: ") + e.what(), "ERROR");
+			log->writeFile("Matt_daemon: Quitting.", "INFO");
+			delete log;
+			delete lock;
+			delete daemon;
+			return (EXIT_FAILURE);
+		}
 		log->writeFile("Matt_daemon: Quitting.", "INFO");
+		// std::cout << "END OF DAEMON" << std::endl;
 		delete log;
 		delete lock;
 		delete daemon;
-		return (EXIT_FAILURE);
 	}
-	log->writeFile("Matt_daemon: Quitting.", "INFO");
-	std::cout << "END OF DAEMON" << std::endl;
-	delete log;
-	delete lock;
-	delete daemon;
-	// pid_t				pid;
- 
-	// if ((pid = fork()) < 0) {
-	// 	// IF FAIL
-	// 	std::cerr << "ERROR : fork fail" << std::endl;
-	// 	return( EXIT_FAILURE );
-	// } else if (pid > 0) {
-	// 	// IF FATHER
-	// 	std::cout << "Je suis le père " << pid << std::endl;
-	// 	return( EXIT_SUCCESS );
-	// } else {
-	// 	try {
-	// 		daemon = new Mattdaemon();
-	// 		daemon->run();
-	// 	} catch (std::exception & e) {
-	// 		std::cerr << "Exception : " << e.what() << std::endl;
-	// 	}
-	// }
 	return( EXIT_SUCCESS );
 }
