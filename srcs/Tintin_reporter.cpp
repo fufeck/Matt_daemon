@@ -32,6 +32,9 @@ Tintin_reporter::Tintin_reporter(std::string dirname, bool isLock) : _dirname(di
 			if (mkdir(token.c_str(), 0777) < 0) {
 				throw Tintin_reporter::CdException();
 			}
+			if (chdir(std::string(token + "/").c_str()) < 0) {
+				throw Tintin_reporter::CdException();
+			}
 	    }
 	    dirname.erase(0, pos + delimiter.length());
 	}

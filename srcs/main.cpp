@@ -10,6 +10,7 @@
 //                                                                            //
 // ************************************************************************** //
 
+#include <iostream>
 #include <signal.h>
 #include "Mattdaemon.hpp"
 #include "Tintin_reporter.hpp"
