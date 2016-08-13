@@ -42,7 +42,7 @@ Mattdaemon::~Mattdaemon(void) {
 	
 	std::cout << "STAR ENDEND" << std::endl;
 	// std::cout << "STAR ENDEND : " << this->_fds.size() << std::endl;
-	
+
 	// if (this->_fds.size() > 0) {
 	// 	std::cout << "COUCOU" << std::endl;
 	// 	for (std::list<Fd *>::iterator it = this->_fds.begin(); it != this->_fds.end();) {
@@ -96,6 +96,7 @@ void					Mattdaemon::_startserver(void) {
 	if (listen(fdsock, 4242) < 0) {
 		throw Mattdaemon::ListenException();
 	}
+	std::cout << "PUSH FRONT" << std::endl;
 	this->_fds.push_front(new Fd(FD_SERVER, fdsock));
 }
 
