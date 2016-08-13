@@ -41,6 +41,7 @@ Mattdaemon::Mattdaemon(const Tintin_reporter *tintin_reporter) : _log(tintin_rep
 Mattdaemon::~Mattdaemon(void) {
 	
 	std::cout << "STAR ENDEND" << std::endl;
+	std::cout << "STAR ENDEND : " << this->_fds.empty() << std::endl;
 	if (!this->_fds.empty()) {
 		
 		for (std::list<Fd *>::iterator it = this->_fds.begin(); it != this->_fds.end();) {
