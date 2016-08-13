@@ -16,13 +16,9 @@ RM					=	rm -rf
 
 CFLAGS				=	-Werror -Wall -W -Wextra
 
-
 NAME				=	Matt_daemon
 
-INCLUDES			=	-I includes -I libs
-
-
-LIBS				=	
+INCLUDES			=	-I includes
 
 
 SRCS				=	srcs/main.cpp				\
@@ -35,7 +31,7 @@ OBJS				=	$(SRCS:.cpp=.o)
 all					:	$(NAME) $(NAME_NCURSE)
 
 $(NAME)				:	$(OBJS)
-						$(CC) -o $@ $(CFLAGS) $(OBJS) $(LIBS) $(INCLUDES)
+						$(CC) -o $@ $(CFLAGS) $(OBJS) $(INCLUDES)
 
 .cpp.o				:
 						$(CC) -o $@ $(CFLAGS) $(INCLUDES) -c $<
