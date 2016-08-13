@@ -51,7 +51,7 @@ int 				main(void)
 	} catch (std::exception & e) {
 		std::cerr << "Can't open :" << PATH_DIR_LOG << std::endl;
 		delete log;
-		return (EXIT_FAILURE);
+		return (-1);
 	}
  	// std::cout << "b" << std::endl;
 	try {
@@ -63,17 +63,17 @@ int 				main(void)
 		log->writeFile("Matt_daemon: Quitting.", "INFO");
 		delete log;
 		delete lock;
-		return (EXIT_FAILURE);
+		return (-1);
 	}
  	// std::cout << "c" << std::endl;
 	if ((pid = fork()) < 0) {
 		// IF FAIL
 		std::cerr << "ERROR : fork fail" << std::endl;
-		return( EXIT_FAILURE );
+		return(-1);
 	} else if (pid > 0) {
 		// IF FATHER
 		// std::cout << "Je suis le père " << pid << std::endl;
-		return( EXIT_SUCCESS );
+		return(0);
 	} else {
 		try {
 			// CREATE AND RUN DAEMON
@@ -87,7 +87,7 @@ int 				main(void)
 			delete log;
 			delete lock;
 			delete daemon;
-			return (EXIT_FAILURE);
+			return (-1);
 		}
 		log->writeFile("Matt_daemon: Quitting.", "INFO");
 		// std::cout << "END OF DAEMON" << std::endl;
@@ -95,5 +95,5 @@ int 				main(void)
 		delete lock;
 		delete daemon;
 	}
-	return( EXIT_SUCCESS );
+	return(0);
 }
