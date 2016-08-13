@@ -84,9 +84,13 @@ int 				main(void)
 	} catch (std::exception & e) {
 		log->writeFile(std::string("Matt_daemon: ") + e.what(), "ERROR");
 		log->writeFile("Matt_daemon: Quitting.", "INFO");
+		std::cout << "END OF DAEMON CATCH" << std::endl;
 		delete log;
+		std::cout << "END OF DAEMON CATCH" << std::endl;
 		delete lock;
+		std::cout << "END OF DAEMON CATCH" << std::endl;
 		delete daemon;
+		std::cout << "END OF DAEMON CATCH" << std::endl;
 		return (-1);
 	}
 	log->writeFile("Matt_daemon: Quitting.", "INFO");
