@@ -43,7 +43,7 @@ Mattdaemon::~Mattdaemon(void) {
 	std::cout << "STAR ENDEND" << std::endl;
 	std::cout << "STAR ENDEND : " << this->_fds.empty() << std::endl;
 	if (!this->_fds.empty()) {
-		
+		std::cout << "COUCOU" << std::endl;
 		for (std::list<Fd *>::iterator it = this->_fds.begin(); it != this->_fds.end();) {
 			std::cout << "LOOP CLIENT: " << *it << std::endl;
 			if ((*it)->type == FD_CLIENT) {
