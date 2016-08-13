@@ -23,19 +23,19 @@
 #include "Mattdaemon.hpp"
 
 Mattdaemon::Mattdaemon(const Tintin_reporter *tintin_reporter) : _log(tintin_reporter) {
-	pid_t				sid;
-	std::stringstream 	ss;
+	// pid_t				sid;
+	// std::stringstream 	ss;
 
 	this->_isEnd = false;
 	this->_log->writeFile("Matt_daemon: Creating server.", "INFO");
 	this->_startserver();
 	this->_log->writeFile("Matt_daemon: Server created.", "INFO");
 	this->_log->writeFile("Matt_daemon: Entering Daemon mode.", "INFO");
-	if ((sid = setsid()) < 0) {
-		throw Mattdaemon::SidException();
-	}
-	ss << "Matt_daemon: started. PID: " << sid << ".";
-	this->_log->writeFile(ss.str(), "INFO");
+	// if ((sid = setsid()) < 0) {
+	// 	throw Mattdaemon::SidException();
+	// }
+	// ss << "Matt_daemon: started. PID: " << sid << ".";
+	// this->_log->writeFile(ss.str(), "INFO");
 }
 
 Mattdaemon::~Mattdaemon(void) {
@@ -107,6 +107,7 @@ void					Mattdaemon::_accept_client(const int fdsock) {
 
 void					Mattdaemon::_display_msgs(void) {
 
+	std::cout << "DISPLAY MSG" << std::endl;
 	for (std::list<std::string *>::iterator it = this->_msgs.begin(); it != this->_msgs.end(); it++) {
 		if ((**it).compare("quit") == 0) {
 			this->_log->writeFile("Matt_daemon: Request quit.", "INFO");
@@ -118,10 +119,12 @@ void					Mattdaemon::_display_msgs(void) {
 		this->_msgs.erase(it);
 	}
     this->_msgs.clear();
+	std::cout << "DISPLAY MSG END" << std::endl;
 }
 
 int					Mattdaemon::_read_client(const int fd) {
 
+	std::cout << "READ CLIENT : " << fd << std::endl;
 	std::string 		*str = new std::string();
 	char				buff[BUF_SIZE + 1];
 	int					len;
@@ -185,6 +188,7 @@ void					Mattdaemon::run(void) {
 	
 	while (!this->_isEnd) {
 		this->_init_fd();
+		std::cout << "BEFORE SELECT" << std::endl;
 		if (select(this->_fds.size() + 5, &this->_rd, NULL, NULL, NULL) < 0) {
 			if (this->_isEnd) {
 				return ;
