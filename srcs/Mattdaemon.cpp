@@ -40,18 +40,18 @@ Mattdaemon::Mattdaemon(const Tintin_reporter *tintin_reporter) : _log(tintin_rep
 
 Mattdaemon::~Mattdaemon(void) {
 	
-	for (std::list<Fd *>::iterator it = this->_fds.begin(); it != this->_fds.end(); it++) {
+	for (std::list<Fd *>::iterator it = this->_fds.begin(); it != this->_fds.end();) {
 		if ((*it)->type == FD_CLIENT) {
 			close((*it)->fd);
 			delete *it;
-			this->_fds.erase(it);
+			this->_fds.erase(it++);
 		}
 	}
-	for (std::list<Fd *>::iterator it = this->_fds.begin(); it != this->_fds.end(); it++) {
+	for (std::list<Fd *>::iterator it = this->_fds.begin(); it != this->_fds.end();) {
 		if ((*it)->type == FD_SERVER) {
 			close((*it)->fd);
 			delete *it;
-			this->_fds.erase(it);
+			this->_fds.erase(it++);
 		}
 	}
     this->_fds.clear();
@@ -109,22 +109,22 @@ void					Mattdaemon::_display_msgs(void) {
 
 	std::cout << "DISPLAY MSG" << std::endl;
 	for (std::list<std::string *>::iterator it = this->_msgs.begin(); it != this->_msgs.end();) {
-		std::cout << "LOOP : " << *it << std::endl;
-		if (*it != NULL) {
-			if ((**it).compare("quit") == 0) {
-				this->_log->writeFile("Matt_daemon: Request quit.", "INFO");
-				this->_isEnd = true;
-			} else {
-				this->_log->writeFile("Matt_daemon: User input: " + **it, "LOG");
-			}
-			std::cout << "LOOP : " << *it << std::endl;
-			delete *it;
-			std::cout << "LOOP : " << *it << std::endl;
-			this->_msgs.erase(it++);
+		// std::cout << "LOOP : " << *it << std::endl;
+		// if (*it != NULL) {
+		if ((**it).compare("quit") == 0) {
+			this->_log->writeFile("Matt_daemon: Request quit.", "INFO");
+			this->_isEnd = true;
+		} else {
+			this->_log->writeFile("Matt_daemon: User input: " + **it, "LOG");
 		}
-		std::cout << "LOOP : " << *it << std::endl;
+		// std::cout << "LOOP : " << *it << std::endl;
+		delete *it;
+		// std::cout << "LOOP : " << *it << std::endl;
+		this->_msgs.erase(it++);
+		// }
+		// std::cout << "LOOP : " << *it << std::endl;
 	}
-	std::cout << "DISPLAY MSG END" << std::endl;
+	// std::cout << "DISPLAY MSG END" << std::endl;
     this->_msgs.clear();
 	std::cout << "DISPLAY MSG END" << std::endl;
 }
@@ -169,15 +169,16 @@ void			Mattdaemon::_init_fd(void) {
 
 void			Mattdaemon::_loop_fd(void) {
 
-	for (std::list<Fd *>::iterator it = this->_fds.begin(); it != this->_fds.end(); it++) {
+	for (std::list<Fd *>::iterator it = this->_fds.begin(); it != this->_fds.end();) {
 		if (FD_ISSET((*it)->fd, &this->_rd)) {
 			if ((*it)->type == FD_SERVER) {
 				this->_accept_client((*it)->fd);
+				it++;
 			} else if ((*it)->type == FD_CLIENT) {
 				if (this->_read_client((*it)->fd) < 0) {
 					close((*it)->fd);
 					delete *it;
-					this->_fds.erase(it);
+					this->_fds.erase(it++);
 					this->_log->writeFile("Matt_daemon: A client has disconnected.", "INFO");
 				}
 			}
