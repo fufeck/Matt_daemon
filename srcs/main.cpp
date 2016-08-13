@@ -90,10 +90,13 @@ int 				main(void)
 		return (-1);
 	}
 	log->writeFile("Matt_daemon: Quitting.", "INFO");
-	// std::cout << "END OF DAEMON" << std::endl;
+	std::cout << "END OF DAEMON" << std::endl;
 	delete log;
+	std::cout << "END OF DAEMON" << std::endl;
 	delete lock;
+	std::cout << "END OF DAEMON" << std::endl;
 	delete daemon;
+	std::cout << "END OF DAEMON" << std::endl;
 	// }
 	return(0);
 }
