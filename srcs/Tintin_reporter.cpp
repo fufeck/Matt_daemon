@@ -15,9 +15,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <string>
-#include <algorithm>
-#include <iterator>
+#include <stdio.h>
 #include <iostream>
 #include <iomanip>
 #include <sstream>
