@@ -10,10 +10,13 @@
 //                                                                            //
 // ************************************************************************** //
 
+#include <strings.h>
 #include <netdb.h>
 #include <sys/socket.h>
 #include <sys/select.h>
-
+#include <string>
+#include <algorithm>
+#include <iterator>
 #include <iostream>
 #include <sstream>
 
