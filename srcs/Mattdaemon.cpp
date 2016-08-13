@@ -119,7 +119,10 @@ void					Mattdaemon::_display_msgs(void) {
 		std::cout << "LOOP : " << *it << std::endl;
 		this->_msgs.erase(it);
 		std::cout << "LOOP : " << *it << std::endl;
+		delete *it;
+		std::cout << "LOOP : " << *it << std::endl;
 	}
+	std::cout << "DISPLAY MSG END" << std::endl;
     this->_msgs.clear();
 	std::cout << "DISPLAY MSG END" << std::endl;
 }
