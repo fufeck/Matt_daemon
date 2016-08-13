@@ -88,7 +88,7 @@ int 				main(void)
 		delete log;
 		std::cout << "END OF DAEMON CATCH" << std::endl;
 		delete lock;
-		std::cout << "END OF DAEMON CATCH" << std::endl;
+		std::cout << "END OF DAEMON CATCH" << daemon << std::endl;
 		delete daemon;
 		std::cout << "END OF DAEMON CATCH" << std::endl;
 		return (-1);
