@@ -109,7 +109,7 @@ void					Mattdaemon::_display_msgs(void) {
 
 	std::cout << "DISPLAY MSG" << std::endl;
 	for (std::list<std::string *>::iterator it = this->_msgs.begin(); it != this->_msgs.end();) {
-		// std::cout << "LOOP : " << *it << std::endl;
+		std::cout << "LOOP : " << *it << " : " << **it << std::endl;
 		// if (*it != NULL) {
 		if ((**it).compare("quit") == 0) {
 			this->_log->writeFile("Matt_daemon: Request quit.", "INFO");
@@ -117,12 +117,12 @@ void					Mattdaemon::_display_msgs(void) {
 		} else {
 			this->_log->writeFile("Matt_daemon: User input: " + **it, "LOG");
 		}
-		// std::cout << "LOOP : " << *it << std::endl;
+		std::cout << "LOOP : " << *it << std::endl;
 		delete *it;
-		// std::cout << "LOOP : " << *it << std::endl;
+		std::cout << "LOOP : " << *it << std::endl;
 		this->_msgs.erase(it++);
 		// }
-		// std::cout << "LOOP : " << *it << std::endl;
+		std::cout << "LOOP : " << *it << std::endl;
 	}
 	// std::cout << "DISPLAY MSG END" << std::endl;
     this->_msgs.clear();
