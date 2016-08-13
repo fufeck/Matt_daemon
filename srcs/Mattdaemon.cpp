@@ -41,7 +41,7 @@ Mattdaemon::Mattdaemon(const Tintin_reporter *tintin_reporter) : _log(tintin_rep
 Mattdaemon::~Mattdaemon(void) {
 	
 	std::cout << "STAR ENDEND" << std::endl;
-	if (this->_fds != NULL) {
+	if (!this->_fds.empty()) {
 		
 		for (std::list<Fd *>::iterator it = this->_fds.begin(); it != this->_fds.end();) {
 			std::cout << "LOOP CLIENT: " << *it << std::endl;
@@ -63,7 +63,7 @@ Mattdaemon::~Mattdaemon(void) {
 		std::cout << "ENDEND" << std::endl;
 	    this->_fds.clear();
 	}
-	if (this->_mgs != NULL) {
+	if (!this->_mgs.empty()) {
 		std::cout << "ENDEND" << std::endl;
     	this->_msgs.clear();
 	}
