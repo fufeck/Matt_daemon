@@ -89,7 +89,7 @@ int 				main(void)
 		std::cout << "END OF DAEMON CATCH" << std::endl;
 		delete lock;
 		std::cout << "END OF DAEMON CATCH" << daemon << std::endl;
-		delete daemon;
+		// delete daemon;
 		std::cout << "END OF DAEMON CATCH" << std::endl;
 		return (-1);
 	}
@@ -99,7 +99,7 @@ int 				main(void)
 	std::cout << "END OF DAEMON" << std::endl;
 	delete lock;
 	std::cout << "END OF DAEMON" << std::endl;
-	delete daemon;
+	// delete daemon;
 	std::cout << "END OF DAEMON" << std::endl;
 	// }
 	return(0);
