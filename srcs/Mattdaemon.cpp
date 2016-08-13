@@ -40,7 +40,9 @@ Mattdaemon::Mattdaemon(const Tintin_reporter *tintin_reporter) : _log(tintin_rep
 
 Mattdaemon::~Mattdaemon(void) {
 	
+	std::cout << "STAR ENDEND" << std::endl;
 	for (std::list<Fd *>::iterator it = this->_fds.begin(); it != this->_fds.end();) {
+		std::cout << "LOOP CLIENT: " << *it << std::endl;
 		std::cout << "LOOP CLIENT: " << *it << " : " << (*it)->fd << std::endl;
 		if ((*it)->type == FD_CLIENT) {
 			close((*it)->fd);
