@@ -40,11 +40,11 @@ Tintin_reporter::Tintin_reporter(std::string dirname, bool isLock) : _dirname(di
 	    dirname.erase(0, pos + delimiter.length());
 	}
 	if (isLock) {
-		if ((this->_fd = open(dirname.c_str(), O_CREAT | O_EXLOCK)) < 0) {
+		if ((this->_fd = open(dirname.c_str(), O_CREAT)) < 0) {
 			throw Tintin_reporter::OpenException();
 		}
 	} else {
-		if ((this->_fd = open(dirname.c_str(), O_WRONLY | O_CREAT | O_SHLOCK, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)) < 0) {
+		if ((this->_fd = open(dirname.c_str(), O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)) < 0) {
 			throw Tintin_reporter::OpenException();
 		}
 	}
