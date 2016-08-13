@@ -63,7 +63,7 @@ Mattdaemon::~Mattdaemon(void) {
 		std::cout << "ENDEND" << std::endl;
 	    this->_fds.clear();
 	}
-	if (!this->_mgs.empty()) {
+	if (!this->_msgs.empty()) {
 		std::cout << "ENDEND" << std::endl;
     	this->_msgs.clear();
 	}
