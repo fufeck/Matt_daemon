@@ -35,13 +35,14 @@ class Mattdaemon
 {
 
 private:
+	std::list<Fd *>				_fds;
+	std::list<std::string *>	_msgs;
+
 	const Tintin_reporter		*_log;
 	Tintin_reporter				*_lock;
 
 	bool						_isEnd;
 	fd_set						_rd;
-	std::list<Fd *>				_fds;
-	std::list<std::string *>	_msgs;
 
 	void						_accept_client(const int fdsock);
 	int							_read_client(const int fd);
