@@ -42,6 +42,7 @@ Mattdaemon::~Mattdaemon(void) {
 	
 	std::cout << "STAR ENDEND" << std::endl;
 	std::cout << "STAR ENDEND : " << this->_fds.empty() << std::endl;
+	std::cout << "STAR ENDEND : " << this->_fds.size() << std::endl;
 	if (!this->_fds.empty()) {
 		std::cout << "COUCOU" << std::endl;
 		for (std::list<Fd *>::iterator it = this->_fds.begin(); it != this->_fds.end();) {
