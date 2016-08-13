@@ -186,9 +186,10 @@ void			Mattdaemon::_loop_fd(void) {
 
 	for (std::list<Fd *>::iterator it = this->_fds.begin(); it != this->_fds.end();) {
 		if (FD_ISSET((*it)->fd, &this->_rd)) {
+			std::cout << "LOOP" << std::endl; 
 			if ((*it)->type == FD_SERVER) {
 				this->_accept_client((*it)->fd);
-				it++;
+				++it;
 			} else if ((*it)->type == FD_CLIENT) {
 				if (this->_read_client((*it)->fd) < 0) {
 					close((*it)->fd);
