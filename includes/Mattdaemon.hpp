@@ -16,6 +16,7 @@
 #include <stdexcept>
 #include <list>
 #include <string>
+#include <sys/select.h>
 
 #include "Fd.hpp"
 #include "Tintin_reporter.hpp"
