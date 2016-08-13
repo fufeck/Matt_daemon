@@ -35,7 +35,6 @@ void sighandler(int signum)
 int 				main(void)
 {
 	// pid_t			pid;
-	Mattdaemon		*daemon;
 	Tintin_reporter	*log;
 	Tintin_reporter	*lock;
 
@@ -78,9 +77,10 @@ int 				main(void)
 	try {
 		// CREATE AND RUN DAEMON
 		// std::cout << "Je suis le fils " << pid << std::endl;
-		daemon = new Mattdaemon(log);
-		sigleton(daemon);
-		daemon->run();
+		Mattdaemon		daemon(log);
+		// daemon = new Mattdaemon(log);
+		sigleton(&daemon);
+		daemon.run();
 	} catch (std::exception & e) {
 		log->writeFile(std::string("Matt_daemon: ") + e.what(), "ERROR");
 		log->writeFile("Matt_daemon: Quitting.", "INFO");
@@ -88,7 +88,7 @@ int 				main(void)
 		delete log;
 		std::cout << "END OF DAEMON CATCH" << std::endl;
 		delete lock;
-		std::cout << "END OF DAEMON CATCH" << daemon << std::endl;
+		// std::cout << "END OF DAEMON CATCH" << daemon << std::endl;
 		// delete daemon;
 		std::cout << "END OF DAEMON CATCH" << std::endl;
 		return (-1);
