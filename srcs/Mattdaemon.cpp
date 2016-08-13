@@ -117,9 +117,9 @@ void					Mattdaemon::_display_msgs(void) {
 			this->_log->writeFile("Matt_daemon: User input: " + **it, "LOG");
 		}
 		std::cout << "LOOP : " << *it << std::endl;
-		delete *it;
-		std::cout << "LOOP : " << *it << std::endl;
 		this->_msgs.erase(it);
+		std::cout << "LOOP : " << *it << std::endl;
+		delete *it;
 		std::cout << "LOOP : " << *it << std::endl;
 	}
     this->_msgs.clear();
