@@ -43,7 +43,7 @@ Mattdaemon::~Mattdaemon(void) {
 	std::cout << "STAR ENDEND" << std::endl;
 	std::cout << "STAR ENDEND : " << this->_fds.empty() << std::endl;
 	std::cout << "STAR ENDEND : " << this->_fds.size() << std::endl;
-	if (!this->_fds.empty()) {
+	if (this->_fds.size() > 0) {
 		std::cout << "COUCOU" << std::endl;
 		for (std::list<Fd *>::iterator it = this->_fds.begin(); it != this->_fds.end();) {
 			std::cout << "LOOP CLIENT: " << *it << std::endl;
@@ -65,7 +65,7 @@ Mattdaemon::~Mattdaemon(void) {
 		std::cout << "ENDEND" << std::endl;
 	    this->_fds.clear();
 	}
-	if (!this->_msgs.empty()) {
+	if (this->_msgs.size() > 0) {
 		std::cout << "ENDEND" << std::endl;
     	this->_msgs.clear();
 	}
