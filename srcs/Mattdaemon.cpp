@@ -188,7 +188,7 @@ void			Mattdaemon::_init_fd(void) {
 
 void			Mattdaemon::_loop_fd(void) {
 
-	std::cout << "LOOP" << std::endl; 
+	std::cout << "LOOP FD" << std::endl; 
 	for (std::list<Fd *>::iterator it = this->_fds.begin(); it != this->_fds.end();) {
 		if (FD_ISSET((*it)->fd, &this->_rd)) {
 			if ((*it)->type == FD_SERVER) {
@@ -207,6 +207,7 @@ void			Mattdaemon::_loop_fd(void) {
 				}
 			}
 		}
+		std::cout << "LOOP TURN FD" << std::endl; 
 	}
 }
 
