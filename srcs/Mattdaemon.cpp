@@ -168,6 +168,7 @@ int					Mattdaemon::_read_client(const int fd) {
 	*str += std::string(buff);
 	(*str).erase(std::remove((*str).begin(), (*str).end(), '\n'), (*str).end());
 	this->_msgs.push_front(str);
+	std::cout << "END READ CLIENT : " << fd << std::endl;
 	return (0);
 }
 
