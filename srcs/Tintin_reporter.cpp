@@ -41,11 +41,14 @@ Tintin_reporter::Tintin_reporter(std::string dirname, bool isLock) :  _dirname(d
 	}
 	if (isLock) {
 		if (access(dirname.c_str(), F_OK) < 0) {
+			// std::cout << "ONE" << std::endl;
 			if ((this->_fd = open(dirname.c_str(), O_CREAT)) < 0) {
+				// std::cout << "ONE COUCOOU" << std::endl;
+				
 				throw Tintin_reporter::OpenException();
 			}
-		}
-		else  {
+		} else  {
+			std::cout << "TWO" << std::endl;
 			throw Tintin_reporter::OpenException();
 		}
 	} else {

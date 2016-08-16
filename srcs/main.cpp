@@ -46,27 +46,28 @@ int 				main(void)
 		Tintin_reporter		log(PATH_DIR_LOG, false);
 		log.writeFile("Matt_daemon: Started", "INFO");
 		try {
-			Tintin_reporter		lock(PATH_DIR_LOCK, true);
-		
-			try {
-				if ((pid = fork()) < 0) {
-					std::cerr << "ERROR : fork fail" << std::endl;
-					return(-1);
-				} else if (pid > 0) {
-					return(0);
-				} else {
+			if ((pid = fork()) < 0) {
+				std::cerr << "ERROR : fork fail" << std::endl;
+				return(-1);
+			} else if (pid > 0) {
+				return(0);
+			} else {
+				Tintin_reporter		lock(PATH_DIR_LOCK, true);
+
+				try {
 					Mattdaemon		daemon(&log);
 					
 					sigleton(&daemon);
 					daemon.run();
+					log.writeFile("Matt_daemon: Quitting.", "INFO");
 					return (0);
+				} catch (std::exception & e) {
+					log.writeFile(std::string("Matt_daemon: ") + e.what(), "ERROR");
+					log.writeFile("Matt_daemon: Quitting.", "INFO");
+					return (-1);
 				}
-			} catch (std::exception & e) {
-				log.writeFile(std::string("Matt_daemon: ") + e.what(), "ERROR");
 				log.writeFile("Matt_daemon: Quitting.", "INFO");
-				return (-1);
 			}
-			log.writeFile("Matt_daemon: Quitting.", "INFO");
 		} catch (std::exception & e) {
 			std::cerr << "Can't open :" << PATH_DIR_LOCK << std::endl;
 			log.writeFile("Matt_daemon: Error file locked.", "ERROR");

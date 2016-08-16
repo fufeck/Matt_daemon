@@ -178,15 +178,15 @@ void			Mattdaemon::_init_fd(void) {
 
 void			Mattdaemon::_loop_fd(void) {
 
-	std::cout << "LOOP FD" << std::endl; 
+	// std::cout << "LOOP FD" << std::endl; 
 	for (std::list<Fd *>::iterator it = this->_fds.begin(); it != this->_fds.end();) {
 		if (FD_ISSET((*it)->fd, &this->_rd)) {
 			if ((*it)->type == FD_SERVER) {
-				std::cout << "FD SERVER : " << (*it)->fd << std::endl; 
+				// std::cout << "FD SERVER : " << (*it)->fd << std::endl; 
 				this->_accept_client((*it)->fd);
 				++it;
 			} else if ((*it)->type == FD_CLIENT) {
-				std::cout << "FD CLIENT : " << (*it)->fd << std::endl; 
+				// std::cout << "FD CLIENT : " << (*it)->fd << std::endl; 
 				if (this->_read_client((*it)->fd) < 0) {
 					close((*it)->fd);
 					delete *it;
@@ -199,7 +199,7 @@ void			Mattdaemon::_loop_fd(void) {
 		} else {
 			++it;
 		}
-		std::cout << "LOOP TURN FD" << std::endl; 
+		// std::cout << "LOOP TURN FD" << std::endl; 
 	}
 }
 
@@ -213,7 +213,7 @@ void					Mattdaemon::run(void) {
 	
 	while (!this->_isEnd) {
 		this->_init_fd();
-		std::cout << "BEFORE SELECT" << std::endl;
+		// std::cout << "BEFORE SELECT" << std::endl;
 		if (select(this->_fds.size() + 5, &this->_rd, NULL, NULL, NULL) < 0) {
 			if (this->_isEnd) {
 				return ;
