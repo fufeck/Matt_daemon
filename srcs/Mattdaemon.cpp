@@ -105,6 +105,7 @@ void					Mattdaemon::_accept_client(const int fdsock) {
 	struct sockaddr_in	csin;
 	socklen_t			csin_len;
 
+	std::cout << "ACCEPT CLIENT" << std::endl;
 	csin_len = sizeof(csin);
 	if ((cs = accept(fdsock, (struct sockaddr*)&csin, &csin_len)) < 0) {
 		this->_log->writeFile("Accept client fail.", "ERROR");
@@ -184,13 +185,15 @@ void			Mattdaemon::_init_fd(void) {
 
 void			Mattdaemon::_loop_fd(void) {
 
+	std::cout << "LOOP" << std::endl; 
 	for (std::list<Fd *>::iterator it = this->_fds.begin(); it != this->_fds.end();) {
 		if (FD_ISSET((*it)->fd, &this->_rd)) {
-			std::cout << "LOOP" << std::endl; 
 			if ((*it)->type == FD_SERVER) {
+				std::cout << "FD SERVER : " << (*it)->fd << std::endl; 
 				this->_accept_client((*it)->fd);
 				++it;
 			} else if ((*it)->type == FD_CLIENT) {
+				std::cout << "FD CLIENT : " << (*it)->fd << std::endl; 
 				if (this->_read_client((*it)->fd) < 0) {
 					close((*it)->fd);
 					delete *it;
