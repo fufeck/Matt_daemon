@@ -22,7 +22,7 @@
 
 #include "Tintin_reporter.hpp"
 
-Tintin_reporter::Tintin_reporter(std::string dirname, bool isLock) :  _fd(0), _dirname(dirname), _isLock(isLock) {
+Tintin_reporter::Tintin_reporter(std::string dirname, bool isLock) :  _dirname(dirname), _isLock(isLock), _fd(0) {
 	std::string 	delimiter = "/";
 	size_t 			pos = 0;
 	std::string 	token;
