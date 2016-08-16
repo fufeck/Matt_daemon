@@ -60,8 +60,11 @@ int 				main(void)
 		std::cerr << "Can't open :" << PATH_DIR_LOCK << std::endl;
 		log->writeFile("Matt_daemon: Error file locked.", "ERROR");
 		log->writeFile("Matt_daemon: Quitting.", "INFO");
+		std::cerr << "log" << std::endl;
 		delete log;
+		std::cerr << "lock" << std::endl;
 		delete lock;
+		std::cerr << "before lock" << std::endl;
 		return (-1);
 	}
  	// std::cout << "c" << std::endl;
