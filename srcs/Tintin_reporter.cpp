@@ -22,7 +22,7 @@
 
 #include "Tintin_reporter.hpp"
 
-Tintin_reporter::Tintin_reporter(std::string dirname, bool isLock) : _dirname(dirname), _isLock(isLock) {
+Tintin_reporter::Tintin_reporter(std::string dirname, bool isLock) :  _fd(0), _dirname(dirname), _isLock(isLock) {
 	std::string 	delimiter = "/";
 	size_t 			pos = 0;
 	std::string 	token;
@@ -58,9 +58,12 @@ Tintin_reporter::Tintin_reporter(std::string dirname, bool isLock) : _dirname(di
 
 
 Tintin_reporter::~Tintin_reporter(void) {
+	std::cout << "IF FD : " << this->_fd << std::endl;
 	if (this->_fd > 0) {
+		std::cout << "CLOSE" << std::endl;
 		close(this->_fd);
 		if (this->_isLock) {
+			std::cout << "IS LOCK REMOVE" << std::endl;
 			remove(this->_dirname.c_str());
 		}
 	}
