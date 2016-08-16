@@ -24,10 +24,10 @@
 #define						FD_MAX			4
 #define						PORT			4242
 #define						BUF_SIZE		256
-#define						PATH_DIR_LOG	"/tmp/matt_daemon/matt_daemon.log"
-#define						PATH_DIR_LOCK	"/tmp/lock/matt_daemon.lock"
-// #define						PATH_DIR_LOG	"/var/log/matt_daemon/matt_daemon.log"
-// #define						PATH_DIR_LOCK	"/var/lock/matt_daemon.lock"
+// #define						PATH_DIR_LOG	"/tmp/matt_daemon/matt_daemon.log"
+// #define						PATH_DIR_LOCK	"/tmp/lock/matt_daemon.lock"
+#define						PATH_DIR_LOG	"/var/log/matt_daemon/matt_daemon.log"
+#define						PATH_DIR_LOCK	"/var/lock/matt_daemon.lock"
 
 enum TypeFd {FD_FREE, FD_CLIENT, FD_SERVER};
 

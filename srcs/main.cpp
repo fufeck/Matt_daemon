@@ -26,7 +26,6 @@ void					*sigleton(Mattdaemon *daemon) {
 
 void sighandler(int signum)
 {
-	// std::cout << "SIG" << std::endl;
 	Mattdaemon 			*daemon = (Mattdaemon *)sigleton(NULL);
 	(void)signum;
 	daemon->finish();
@@ -35,23 +34,22 @@ void sighandler(int signum)
 int 				main(void)
 {
 	pid_t			pid;
-	// Tintin_reporter	*log;
-	// Tintin_reporter	*lock;
 
  	signal(SIGINT, sighandler);
  	signal(SIGABRT, sighandler);
  	signal(SIGTERM, sighandler);
 
-	try {
-		Tintin_reporter		log(PATH_DIR_LOG, false);
-		log.writeFile("Matt_daemon: Started", "INFO");
+	if ((pid = fork()) < 0) {
+		std::cerr << "ERROR : fork fail" << std::endl;
+		return(-1);
+	} else if (pid > 0) {
+		return(0);
+	} else {
 		try {
-			if ((pid = fork()) < 0) {
-				std::cerr << "ERROR : fork fail" << std::endl;
-				return(-1);
-			} else if (pid > 0) {
-				return(0);
-			} else {
+			Tintin_reporter		log(PATH_DIR_LOG, false);
+			log.writeFile("Matt_daemon: Started", "INFO");
+			try {
+
 				Tintin_reporter		lock(PATH_DIR_LOCK, true);
 
 				try {
@@ -67,16 +65,16 @@ int 				main(void)
 					return (-1);
 				}
 				log.writeFile("Matt_daemon: Quitting.", "INFO");
+			} catch (std::exception & e) {
+				std::cerr << "Can't open :" << PATH_DIR_LOCK << std::endl;
+				log.writeFile("Matt_daemon: Error file locked.", "ERROR");
+				log.writeFile("Matt_daemon: Quitting.", "INFO");
+				return (-1);
 			}
 		} catch (std::exception & e) {
-			std::cerr << "Can't open :" << PATH_DIR_LOCK << std::endl;
-			log.writeFile("Matt_daemon: Error file locked.", "ERROR");
-			log.writeFile("Matt_daemon: Quitting.", "INFO");
+			std::cerr << "Can't open :" << PATH_DIR_LOG << std::endl;
 			return (-1);
 		}
-	} catch (std::exception & e) {
-		std::cerr << "Can't open :" << PATH_DIR_LOG << std::endl;
-		return (-1);
 	}
 	return(0);
 }
