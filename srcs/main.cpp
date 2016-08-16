@@ -34,7 +34,7 @@ void sighandler(int signum)
 
 int 				main(void)
 {
-	// pid_t			pid;
+	pid_t			pid;
 	// Tintin_reporter	*log;
 	// Tintin_reporter	*lock;
 
@@ -42,36 +42,28 @@ int 				main(void)
  	signal(SIGABRT, sighandler);
  	signal(SIGTERM, sighandler);
 
- 	// std::cout << "a" << std::endl;
 	try {
-		// CREATE LOG FILE
-		// log = new Tintin_reporter(PATH_DIR_LOG, false);
 		Tintin_reporter		log(PATH_DIR_LOG, false);
-
 		log.writeFile("Matt_daemon: Started", "INFO");
-
 		try {
-			// CREATE LOCK FILE
-			// lock = new Tintin_reporter(PATH_DIR_LOCK, true);
 			Tintin_reporter		lock(PATH_DIR_LOCK, true);
 		
 			try {
-				// CREATE AND RUN DAEMON
-				// std::cout << "Je suis le fils " << pid << std::endl;
-				Mattdaemon		daemon(&log);
-				// daemon = new Mattdaemon(log);
-				sigleton(&daemon);
-				daemon.run();
+				if ((pid = fork()) < 0) {
+					std::cerr << "ERROR : fork fail" << std::endl;
+					return(-1);
+				} else if (pid > 0) {
+					return(0);
+				} else {
+					Mattdaemon		daemon(&log);
+					
+					sigleton(&daemon);
+					daemon.run();
+					return (0);
+				}
 			} catch (std::exception & e) {
 				log.writeFile(std::string("Matt_daemon: ") + e.what(), "ERROR");
 				log.writeFile("Matt_daemon: Quitting.", "INFO");
-				// std::cout << "END OF DAEMON CATCH" << std::endl;
-				// delete log;
-				// // std::cout << "END OF DAEMON CATCH" << std::endl;
-				// delete lock;
-				// std::cout << "END OF DAEMON CATCH" << daemon << std::endl;
-				// delete daemon;
-				// std::cout << "END OF DAEMON CATCH" << std::endl;
 				return (-1);
 			}
 			log.writeFile("Matt_daemon: Quitting.", "INFO");
@@ -79,38 +71,11 @@ int 				main(void)
 			std::cerr << "Can't open :" << PATH_DIR_LOCK << std::endl;
 			log.writeFile("Matt_daemon: Error file locked.", "ERROR");
 			log.writeFile("Matt_daemon: Quitting.", "INFO");
-			// std::cerr << "log" << std::endl;
-			// delete log;
-			// std::cerr << "lock" << std::endl;
-			// delete lock;
-			// std::cerr << "before lock" << std::endl;
 			return (-1);
 		}
-
-		
 	} catch (std::exception & e) {
 		std::cerr << "Can't open :" << PATH_DIR_LOG << std::endl;
-		// delete log;
 		return (-1);
 	}
- 	// std::cout << "b" << std::endl;
- 	// std::cout << "c" << std::endl;
-	// if ((pid = fork()) < 0) {
-	// 	// IF FAIL
-	// 	std::cerr << "ERROR : fork fail" << std::endl;
-	// 	return(-1);
-	// } else if (pid > 0) {
-	// 	// IF FATHER
-	// 	// std::cout << "Je suis le père " << pid << std::endl;
-	// 	return(0);
-	// } else {
-	// std::cout << "END OF DAEMON" << std::endl;
-	// delete log;
-	// // std::cout << "END OF DAEMON" << std::endl;
-	// delete lock;
-	// std::cout << "END OF DAEMON" << std::endl;
-	// delete daemon;
-	// std::cout << "END OF DAEMON" << std::endl;
-	// }
 	return(0);
 }

@@ -57,16 +57,16 @@ Tintin_reporter::Tintin_reporter(std::string dirname, bool isLock) :  _dirname(d
 
 
 Tintin_reporter::~Tintin_reporter(void) {
-	std::cout << "IF FD : " << this->_fd << std::endl;
+	// std::cout << "IF FD : " << this->_fd << std::endl;
 	if (this->_fd > 0) {
-		std::cout << "CLOSE" << std::endl;
+		// std::cout << "CLOSE" << std::endl;
 		close(this->_fd);
 		if (this->_isLock) {
-			std::cout << "IS LOCK REMOVE" << std::endl;
+			// std::cout << "IS LOCK REMOVE" << std::endl;
 			remove(this->_dirname.c_str());
 		}
 	}
-	std::cout << "DELETE TINTINT Rep END" << this->_fd << std::endl;
+	// std::cout << "DELETE TINTINT Rep END" << this->_fd << std::endl;
 }
 
 void				Tintin_reporter::writeFile(const std::string &str, const std::string type) const {

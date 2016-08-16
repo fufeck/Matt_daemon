@@ -23,26 +23,26 @@
 #include "Mattdaemon.hpp"
 
 Mattdaemon::Mattdaemon(const Tintin_reporter *tintin_reporter) : _log(tintin_reporter) {
-	// pid_t				sid;
-	// std::stringstream 	ss;
+	pid_t				sid;
+	std::stringstream 	ss;
 
 	this->_isEnd = false;
 	this->_log->writeFile("Matt_daemon: Creating server.", "INFO");
 	this->_startserver();
 	this->_log->writeFile("Matt_daemon: Server created.", "INFO");
 	this->_log->writeFile("Matt_daemon: Entering Daemon mode.", "INFO");
-	// if ((sid = setsid()) < 0) {
-	// 	throw Mattdaemon::SidException();
-	// }
-	// ss << "Matt_daemon: started. PID: " << sid << ".";
-	// this->_log->writeFile(ss.str(), "INFO");
+	if ((sid = setsid()) < 0) {
+		throw Mattdaemon::SidException();
+	}
+	ss << "Matt_daemon: started. PID: " << sid << ".";
+	this->_log->writeFile(ss.str(), "INFO");
 }
 
 Mattdaemon::~Mattdaemon(void) {
 	
 	for (std::list<Fd *>::iterator it = this->_fds.begin(); it != this->_fds.end();) {
 		if ((*it)->type == FD_CLIENT) {
-			std::cout << "CLOSE AND DELETE CLIENT FD : " << (*it)->fd << std::endl;
+			// std::cout << "CLOSE AND DELETE CLIENT FD : " << (*it)->fd << std::endl;
 			close((*it)->fd);
 			delete *it;
 			this->_fds.erase(it++);
@@ -52,7 +52,7 @@ Mattdaemon::~Mattdaemon(void) {
 	}
 	for (std::list<Fd *>::iterator it = this->_fds.begin(); it != this->_fds.end();) {
 		if ((*it)->type == FD_SERVER) {
-			std::cout << "CLOSE AND DELETE SERVER FD : " << (*it)->fd << std::endl;
+			// std::cout << "CLOSE AND DELETE SERVER FD : " << (*it)->fd << std::endl;
 			close((*it)->fd);
 			delete *it;
 			this->_fds.erase(it++);
@@ -88,7 +88,7 @@ void					Mattdaemon::_startserver(void) {
 	if (listen(fdsock, 4242) < 0) {
 		throw Mattdaemon::ListenException();
 	}
-	std::cout << "PUSH FRONT" << std::endl;
+	// std::cout << "PUSH FRONT" << std::endl;
 	this->_fds.push_front(new Fd(FD_SERVER, fdsock));
 }
 
@@ -97,7 +97,7 @@ void					Mattdaemon::_accept_client(const int fdsock) {
 	struct sockaddr_in	csin;
 	socklen_t			csin_len;
 
-	std::cout << "ACCEPT CLIENT" << std::endl;
+	// std::cout << "ACCEPT CLIENT" << std::endl;
 	csin_len = sizeof(csin);
 	if ((cs = accept(fdsock, (struct sockaddr*)&csin, &csin_len)) < 0) {
 		this->_log->writeFile("Accept client fail.", "ERROR");
@@ -115,22 +115,20 @@ void					Mattdaemon::_accept_client(const int fdsock) {
 
 void					Mattdaemon::_display_msgs(void) {
 
-	std::cout << "DISPLAY MSG" << std::endl;
+	// std::cout << "DISPLAY MSG" << std::endl;
 	for (std::list<std::string *>::iterator it = this->_msgs.begin(); it != this->_msgs.end();) {
-		std::cout << "LOOP : " << *it << " : " << **it << std::endl;
-		// if (*it != NULL) {
+		// std::cout << "LOOP : " << *it << " : " << **it << std::endl;
 		if ((**it).compare("quit") == 0) {
 			this->_log->writeFile("Matt_daemon: Request quit.", "INFO");
 			this->_isEnd = true;
 		} else {
 			this->_log->writeFile("Matt_daemon: User input: " + **it, "LOG");
 		}
-		std::cout << "LOOP : " << *it << std::endl;
+		// std::cout << "LOOP : " << *it << std::endl;
 		delete *it;
-		std::cout << "LOOP : " << *it << std::endl;
+		// std::cout << "LOOP : " << *it << std::endl;
 		this->_msgs.erase(it++);
-		// }
-		std::cout << "LOOP : " << *it << std::endl;
+		// std::cout << "LOOP : " << *it << std::endl;
 	}
 	// std::cout << "DISPLAY MSG END" << std::endl;
     this->_msgs.clear();
@@ -139,7 +137,7 @@ void					Mattdaemon::_display_msgs(void) {
 
 int					Mattdaemon::_read_client(const int fd) {
 
-	std::cout << "READ CLIENT : " << fd << std::endl;
+	// std::cout << "READ CLIENT : " << fd << std::endl;
 	std::string 		*str = new std::string();
 	char				buff[BUF_SIZE + 1];
 	int					len;
@@ -153,7 +151,7 @@ int					Mattdaemon::_read_client(const int fd) {
 		*str += std::string(buff);
 		bzero(buff, BUF_SIZE);
 	}
-	std::cout << "LEN : " << len << std::endl;
+	// std::cout << "LEN : " << len << std::endl;
 	if (len <= 0) {
 		return (-1);
 	}
@@ -161,7 +159,7 @@ int					Mattdaemon::_read_client(const int fd) {
 	*str += std::string(buff);
 	(*str).erase(std::remove((*str).begin(), (*str).end(), '\n'), (*str).end());
 	this->_msgs.push_front(str);
-	std::cout << "END READ CLIENT : " << fd << std::endl;
+	// std::cout << "END READ CLIENT : " << fd << std::endl;
 	return (0);
 }
 
@@ -171,7 +169,7 @@ void			Mattdaemon::_init_fd(void) {
 	FD_ZERO(&this->_rd);
 	for (std::list<Fd *>::iterator it = this->_fds.begin(); it != this->_fds.end(); it++) {
 		if ((*it)->type != FD_FREE) {
-			std::cout << "FD INIT : " << (*it)->fd << std::endl; 
+			// std::cout << "FD INIT : " << (*it)->fd << std::endl; 
 			FD_SET((*it)->fd, &this->_rd);
 		}
 	}
