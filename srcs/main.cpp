@@ -38,9 +38,9 @@ int 				main(void)
 	Tintin_reporter	*log;
 	Tintin_reporter	*lock;
 
- 	// signal(SIGINT, sighandler);
- 	// signal(SIGABRT, sighandler);
- 	// signal(SIGTERM, sighandler);
+ 	signal(SIGINT, sighandler);
+ 	signal(SIGABRT, sighandler);
+ 	signal(SIGTERM, sighandler);
 
  	// std::cout << "a" << std::endl;
 	try {
