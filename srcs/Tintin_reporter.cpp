@@ -53,7 +53,6 @@ Tintin_reporter::Tintin_reporter(std::string dirname, bool isLock) :  _dirname(d
 			throw Tintin_reporter::OpenException();
 		}
 	}
-	return ;
 }
 
 
@@ -68,7 +67,6 @@ Tintin_reporter::~Tintin_reporter(void) {
 		}
 	}
 	std::cout << "DELETE TINTINT Rep END" << this->_fd << std::endl;
-	return ;
 }
 
 void				Tintin_reporter::writeFile(const std::string &str, const std::string type) const {
