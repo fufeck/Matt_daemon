@@ -40,16 +40,9 @@ Mattdaemon::Mattdaemon(const Tintin_reporter *tintin_reporter) : _log(tintin_rep
 
 Mattdaemon::~Mattdaemon(void) {
 	
-	std::cout << "STAR ENDEND" << std::endl;
-	std::cout << "STAR ENDEND : " << this->_fds.size() << std::endl;
-
-	// this->_msgs.clear();
-	// this->_fds.clear();
-	// if (this->_fds.size() > 0) {
-	std::cout << "COUCOU" << std::endl;
 	for (std::list<Fd *>::iterator it = this->_fds.begin(); it != this->_fds.end();) {
-		std::cout << "LOOP CLIENT: " << *it << std::endl;
 		if ((*it)->type == FD_CLIENT) {
+			std::cout << "CLOSE AND DELETE CLIENT FD : " << (*it)->fd << std::endl;
 			close((*it)->fd);
 			delete *it;
 			this->_fds.erase(it++);
@@ -57,10 +50,9 @@ Mattdaemon::~Mattdaemon(void) {
 			++it;
 		}
 	}
-	std::cout << "ENDEND >> " << std::endl;
 	for (std::list<Fd *>::iterator it = this->_fds.begin(); it != this->_fds.end();) {
-		std::cout << "LOOP SERVER: " << *it << " : " << (*it)->fd << std::endl;
 		if ((*it)->type == FD_SERVER) {
+			std::cout << "CLOSE AND DELETE SERVER FD : " << (*it)->fd << std::endl;
 			close((*it)->fd);
 			delete *it;
 			this->_fds.erase(it++);
@@ -68,14 +60,8 @@ Mattdaemon::~Mattdaemon(void) {
 			++it;
 		}
 	}
-	std::cout << "ENDEND" << std::endl;
     this->_fds.clear();
-	// }
-	// if (this->_msgs.size() > 0) {
-	// 	std::cout << "ENDEND" << std::endl;
- //    	this->_msgs.clear();
-	// }
-	std::cout << "ENDEND" << std::endl;
+	this->_msgs.clear();
 	return ;
 }
 
