@@ -179,6 +179,7 @@ void			Mattdaemon::_init_fd(void) {
 	FD_ZERO(&this->_rd);
 	for (std::list<Fd *>::iterator it = this->_fds.begin(); it != this->_fds.end(); it++) {
 		if ((*it)->type != FD_FREE) {
+			std::cout << "FD INIT : " << (*it)->fd << std::endl; 
 			FD_SET((*it)->fd, &this->_rd);
 		}
 	}
