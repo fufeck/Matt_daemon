@@ -202,6 +202,8 @@ void			Mattdaemon::_loop_fd(void) {
 					delete *it;
 					this->_fds.erase(it++);
 					this->_log->writeFile("Matt_daemon: A client has disconnected.", "INFO");
+				} else {
+					++it;
 				}
 			}
 		}
