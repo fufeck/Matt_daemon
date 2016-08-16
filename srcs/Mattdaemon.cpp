@@ -161,6 +161,7 @@ int					Mattdaemon::_read_client(const int fd) {
 		*str += std::string(buff);
 		bzero(buff, BUF_SIZE);
 	}
+	std::cout << "LEN : " << len << std::endl;
 	if (len <= 0) {
 		return (-1);
 	}
@@ -225,5 +226,6 @@ void					Mattdaemon::run(void) {
 		}
 		this->_loop_fd();
 		this->_display_msgs();
+		usleep(5000);
 	}
 }
