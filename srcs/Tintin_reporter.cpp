@@ -67,6 +67,7 @@ Tintin_reporter::~Tintin_reporter(void) {
 			remove(this->_dirname.c_str());
 		}
 	}
+	std::cout << "DELETE TINTINT Rep END" << this->_fd << std::endl;
 	return ;
 }
 
