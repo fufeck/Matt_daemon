@@ -206,6 +206,8 @@ void			Mattdaemon::_loop_fd(void) {
 					++it;
 				}
 			}
+		} else {
+			++it;
 		}
 		std::cout << "LOOP TURN FD" << std::endl; 
 	}
