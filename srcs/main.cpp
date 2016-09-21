@@ -66,7 +66,7 @@ int 				main(void)
 				}
 				log.writeFile("Matt_daemon: Quitting.", "INFO");
 			} catch (std::exception & e) {
-				std::cerr << "Can't open :" << PATH_DIR_LOCK << std::endl;
+				std::cerr << "ERROR : " << PATH_DIR_LOCK << " is lock." << std::endl;
 				log.writeFile("Matt_daemon: Error file locked.", "ERROR");
 				log.writeFile("Matt_daemon: Quitting.", "INFO");
 				return (-1);

@@ -41,9 +41,11 @@ Tintin_reporter::Tintin_reporter(std::string dirname, bool isLock) :  _dirname(d
 	    dirname.erase(0, pos + delimiter.length());
 	}
 	if (isLock) {
-		if ((this->_fd = open(dirname.c_str(), O_CREAT)) < 0) {
+		this->_fd = open(dirname.c_str(), O_CREAT);
+		if (this->_fd < 0) {
 			throw Tintin_reporter::OpenException();
-			if (flock(this->_fd, LOCK_EX) < 0) {
+		} else {
+			if (flock(this->_fd, LOCK_EX | LOCK_NB) < 0) {
 				throw Tintin_reporter::LockException();
 			}
 		}
