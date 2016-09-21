@@ -40,24 +40,18 @@ Tintin_reporter::Tintin_reporter(std::string dirname, bool isLock) :  _dirname(d
 	    }
 	    dirname.erase(0, pos + delimiter.length());
 	}
-	if ((this->_fd = open(dirname.c_str(), O_CREAT)) < 0) {
-		throw Tintin_reporter::OpenException();
-		if (isLock) {
+	if (isLock) {
+		if ((this->_fd = open(dirname.c_str(), O_CREAT)) < 0) {
+			throw Tintin_reporter::OpenException();
 			if (flock(this->_fd, LOCK_EX) < 0) {
 				throw Tintin_reporter::LockException();
 			}
 		}
+	} else {
+		if ((this->_fd = open(dirname.c_str(), O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)) < 0) {
+			throw Tintin_reporter::OpenException();
+		}
 	}
-	// if (isLock) {
-	// 	if (access(dirname.c_str(), F_OK) < 0) {
-	// 	} else  {
-	// 		throw Tintin_reporter::OpenException();
-	// 	}
-	// } else {
-	// 	if ((this->_fd = open(dirname.c_str(), O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)) < 0) {
-	// 		throw Tintin_reporter::OpenException();
-	// 	}
-	// }
 }
 
 
