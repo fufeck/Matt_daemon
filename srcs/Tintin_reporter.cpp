@@ -14,6 +14,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/file.h>
 #include <fcntl.h>
 #include <stdio.h>
 #include <iostream>
@@ -39,20 +40,24 @@ Tintin_reporter::Tintin_reporter(std::string dirname, bool isLock) :  _dirname(d
 	    }
 	    dirname.erase(0, pos + delimiter.length());
 	}
-	if (isLock) {
-		if (access(dirname.c_str(), F_OK) < 0) {
-			if ((this->_fd = open(dirname.c_str(), O_CREAT)) < 0) {
-				
-				throw Tintin_reporter::OpenException();
+	if ((this->_fd = open(dirname.c_str(), O_CREAT)) < 0) {
+		throw Tintin_reporter::OpenException();
+		if (isLock) {
+			if (flock(this->_fd, LOCK_EX) < 0) {
+				throw Tintin_reporter::LockException();
 			}
-		} else  {
-			throw Tintin_reporter::OpenException();
-		}
-	} else {
-		if ((this->_fd = open(dirname.c_str(), O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)) < 0) {
-			throw Tintin_reporter::OpenException();
 		}
 	}
+	// if (isLock) {
+	// 	if (access(dirname.c_str(), F_OK) < 0) {
+	// 	} else  {
+	// 		throw Tintin_reporter::OpenException();
+	// 	}
+	// } else {
+	// 	if ((this->_fd = open(dirname.c_str(), O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)) < 0) {
+	// 		throw Tintin_reporter::OpenException();
+	// 	}
+	// }
 }
 
 
@@ -60,6 +65,7 @@ Tintin_reporter::~Tintin_reporter(void) {
 	if (this->_fd > 0) {
 		close(this->_fd);
 		if (this->_isLock) {
+			flock(this->_fd, LOCK_UN);
 			remove(this->_dirname.c_str());
 		}
 	}

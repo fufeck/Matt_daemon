@@ -58,6 +58,13 @@ public:
 			return "Write fail";
 		}
 	};
+
+	class LockException : public std::exception {
+	public:
+		virtual const char* what() const throw() {
+			return "flock fail";
+		}
+	};
 	
 };
 
